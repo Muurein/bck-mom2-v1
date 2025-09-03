@@ -25,11 +25,13 @@ client.connect((error) => {
 });
 
 //skapa tabeller
-client.query(`
-    CREATE TABLE jobs(
-    id SERIAL PRIMARY KEY NOT NULL,
-    company_name VARCHAR(150) NOT NULL,
-    job_title VARCHAR(100) NOT NULL,
-    end_date DATE NOT NULL
-    )
-`);
+// client.query(`
+//     DROP TABLE IF EXISTS jobs;
+//     CREATE TABLE jobs(
+//     id SERIAL PRIMARY KEY NOT NULL,
+//     company_name VARCHAR(150) NOT NULL,
+//     job_title VARCHAR(100) NOT NULL,
+//     end_date DATE NOT NULL,
+//     description VARCHAR(500) NOT NULL
+//     )
+// `);

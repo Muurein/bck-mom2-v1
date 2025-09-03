@@ -35,4 +35,63 @@ client.connect((error) => {
 
 
 //Routes
-app.get("/api/jobs")
+app.get("/api", (req, res) => {
+    res.json( { message: "api funkar"} );
+});
+
+app.get("/api/jobs", (req, res) => {
+    res.json( {message: "hämtar jobb"} );
+});
+
+app.post("/api/jobs", (req, res) => {
+    let companyName = req.body.companyName;
+    let jobTitle = req.body.jobTitle;
+    let endDate = req.body.endDate;
+    let description = req.body.description;
+
+    //errors
+    let errors = {
+        message: "",
+        detail: "",
+        https_response: {
+
+        }
+    };
+
+    //felmeddelanden
+    if(!companyName || !jobTitle || !endDate || !description) {
+        //felmeddelanden
+        errors.message = "Fyll i alla fält";
+        errors.detail = "Skriv in företagsnamn, jobbtitel, slutdatum och beskrivning i JSON";
+
+
+        res.status(400).json(errors);
+
+        //returnera för att avsluta funktionen om inget går fel
+        return;
+    }
+
+    let job = {
+        companyName: companyName,
+        jobTitle: jobTitle,
+        endDate: endDate,
+        description: description
+    };
+
+    res.json( {message: "jobb tillagt", job} );
+});
+
+app.put("/api/jobs/:id", (req, res) => {
+    res.json( {message: "jobb uppdaterat: " + req.params.id } );
+});
+
+app.delete("/api/jobs/:id", (req, res) => {
+    res.json( {message: "jobb raderat: " + req.params.id } );
+});
+
+
+
+
+app.listen(process.env.PORT, () => {
+    console.log("Server startad på: " + process.env.PORT);
+});
