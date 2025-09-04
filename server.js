@@ -6,6 +6,8 @@ const cors = require("cors");
 
 //startar appen
 const app = express();
+const port = process.env.PORT || 8000;
+
 app.use(express.static("public"));
 app.use(express.urlencoded( {extended: true } ));
 app.use(express.json());
@@ -40,7 +42,23 @@ app.get("/api", (req, res) => {
 });
 
 app.get("/api/jobs", (req, res) => {
-    res.json( {message: "hämtar jobb"} );
+    
+    //hämtar jobb
+    client.query(`SELECT * FROM jobs`, (error, results) => {
+        
+        //om något går fel
+        if(error) {
+             res.status(500).json({error: "Something went wrong: " + error} );
+             return;
+        }
+
+        //om det inte finns några jobb
+        if(results.length === 0) {
+            res.response(404).json( {message: "Inga jobb hittade"} );
+        } else {
+            res.json(results);
+        }
+    });
 });
 
 app.post("/api/jobs", (req, res) => {
@@ -64,21 +82,39 @@ app.post("/api/jobs", (req, res) => {
         errors.message = "Fyll i alla fält";
         errors.detail = "Skriv in företagsnamn, jobbtitel, slutdatum och beskrivning i JSON";
 
+        //svarskod
+        errors.https_response.message = "Bad request";
+        errors.https_response.detail = "400";
 
         res.status(400).json(errors);
 
-        //returnera för att avsluta funktionen om inget går fel
+        //returnerar för att avsluta funktionen om inget går fel
         return;
     }
 
-    let job = {
-        companyName: companyName,
-        jobTitle: jobTitle,
-        endDate: endDate,
-        description: description
-    };
+    //lägger till jobb till databas
+    client.query(`INSERT INTO jobs(company_name, job_title, end_date, description) VALUES($1, $2, $3, $4)`,
+        [companyName, jobTitle, endDate, description],
+        (error, results) => {
+            if(error) {
+                res.status(500).json({error: "Something went wrong: " + error} );
+                return;
+            }
 
-    res.json( {message: "jobb tillagt", job} );
+            console.log("Fråga skapad: " + results);
+
+            let job = {
+                companyName: companyName,
+                jobTitle: jobTitle,
+                endDate: endDate,
+                description: description
+            };
+
+            res.json( {message: "jobb tillagt", job} );
+        }
+    );
+
+
 });
 
 app.put("/api/jobs/:id", (req, res) => {
@@ -92,6 +128,6 @@ app.delete("/api/jobs/:id", (req, res) => {
 
 
 
-app.listen(process.env.PORT, () => {
-    console.log("Server startad på: " + process.env.PORT);
+app.listen(port, () => {
+    console.log("Server startad på: " + port);
 });
