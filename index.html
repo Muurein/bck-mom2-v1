@@ -13,6 +13,7 @@
         const url = "http://127.0.0.1:8000/api/jobs";
 
         getData();
+        //createJob("ISS", "Lokalvårdare", "2016-01-04", "Städade vårdcentraler"); 
 
         async function getData() {
             const response = await fetch(url);
@@ -20,6 +21,26 @@
             const data = await response.json();
 
             console.table(data.rows);
+        }
+
+        async function createJob(companyName, jobTitle, endDate, description) {
+            let jobs = {
+                companyName: companyName,
+                jobTitle: jobTitle,
+                endDate: endDate,
+                description: description
+            }
+
+            const response = await fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(jobs),
+            });
+
+            const data = await response.json();
+            console.log(data);
         }
 
     </script>

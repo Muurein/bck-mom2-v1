@@ -41,6 +41,7 @@ app.get("/api", (req, res) => {
     res.json( { message: "api funkar"} );
 });
 
+//hämta jobb
 app.get("/api/jobs", (req, res) => {
     
     //hämtar jobb
@@ -54,13 +55,14 @@ app.get("/api/jobs", (req, res) => {
 
         //om det inte finns några jobb
         if(results.length === 0) {
-            res.response(404).json( {message: "Inga jobb hittade"} );
+            res.status(404).json( {message: "Inga jobb hittade"} );
         } else {
             res.json(results);
         }
     });
 });
 
+//skapa nya jobb
 app.post("/api/jobs", (req, res) => {
     let companyName = req.body.companyName;
     let jobTitle = req.body.jobTitle;
@@ -117,12 +119,38 @@ app.post("/api/jobs", (req, res) => {
 
 });
 
+//uppdatera jobb baserat på id
 app.put("/api/jobs/:id", (req, res) => {
-    res.json( {message: "jobb uppdaterat: " + req.params.id } );
+    const jobID = req.params.id;
+    const { companyName, jobTitle, endDate, description } = req.body;
+
+    if(!description) {
+        return res.status(400).json({ message: "Se till att alla fält är ifyllda" } );
+    }
+
+    client.query(`UPDATE jobs SET description = $1 WHERE id = $2`, [description, jobID], (error, results) => {
+        if(error) {
+            res.status(500).json( {message: "Något blev fel"} );
+        } else if (results.affectedRows === 0) {
+            res.status(404).json( {message: "Beskrivningen hittades inte"} );
+        } else {
+            res.json( {message: "Beskrviningen har uppdaterats"} );
+        }
+    });
 });
 
+//ta bort jobb
 app.delete("/api/jobs/:id", (req, res) => {
-    res.json( {message: "jobb raderat: " + req.params.id } );
+    const jobID = req.params.id;
+    client.query(`DELETE FROM jobs WHER id = $1`, [id], (error, results) => {
+        if(error) {
+            res.status(500).json( {message: "Något blev fel"} );
+        } else if (results.affectedRows === 0) {
+            res.status(404).json( {message: "Kategorin hittades inte"} );
+        } else {
+            res.json( {message: "Jobbet har tagits bort"} );
+        }
+    });
 });
 
 
