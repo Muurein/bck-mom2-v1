@@ -11,7 +11,11 @@ const port = process.env.PORT || 8000;
 app.use(express.static("public"));
 app.use(express.urlencoded( {extended: true } ));
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+    origin: "http://127.0.0.1:8000/api/jobs",
+    methods: "GET,POST,PUT,DELETE",
+    credentials: true,
+}));
 
 //ansluter till databasen
 const client = new Client ({
@@ -57,13 +61,14 @@ app.get("/api/jobs", (req, res) => {
         if(results.length === 0) {
             res.status(404).json( {message: "Inga jobb hittade"} );
         } else {
-            res.json(results);
+            res.json(results.rows);
         }
     });
 });
 
 //skapa nya jobb
 app.post("/api/jobs", (req, res) => {
+    console.log(req.body);
     let companyName = req.body.companyName;
     let jobTitle = req.body.jobTitle;
     let endDate = req.body.endDate;
@@ -124,35 +129,39 @@ app.put("/api/jobs/:id", (req, res) => {
     const jobID = req.params.id;
     const { companyName, jobTitle, endDate, description } = req.body;
 
-    if(!description) {
+    if(!companyName || !jobTitle || !endDate || !description) {
         return res.status(400).json({ message: "Se till att alla fält är ifyllda" } );
     }
 
-    client.query(`UPDATE jobs SET description = $1 WHERE id = $2`, [description, jobID], (error, results) => {
-        if(error) {
-            res.status(500).json( {message: "Något blev fel"} );
-        } else if (results.affectedRows === 0) {
-            res.status(404).json( {message: "Beskrivningen hittades inte"} );
-        } else {
-            res.json( {message: "Beskrviningen har uppdaterats"} );
-        }
+    client.query(
+        `UPDATE jobs SET company_name = $1, job_title = $2, end_date = $3, description = $4 WHERE id = $5`, 
+        [companyName, jobTitle, endDate, description, jobID], 
+        (error, results) => {
+            if(error) {
+                res.status(500).json( {message: "Något blev fel"} );
+            } else if (results.rowCount === 0) {
+                res.status(404).json( {message: "Jobbet hittades inte"} );
+            } else {
+                res.json( {message: "Jobbet har uppdaterats"} );
+            }
     });
 });
 
 //ta bort jobb
 app.delete("/api/jobs/:id", (req, res) => {
     const jobID = req.params.id;
-    client.query(`DELETE FROM jobs WHER id = $1`, [id], (error, results) => {
-        if(error) {
-            res.status(500).json( {message: "Något blev fel"} );
-        } else if (results.affectedRows === 0) {
-            res.status(404).json( {message: "Kategorin hittades inte"} );
-        } else {
-            res.json( {message: "Jobbet har tagits bort"} );
-        }
+    client.query(`DELETE FROM jobs WHERE id = $1`, 
+        [jobID], 
+        (error, results) => {
+            if(error) {
+                res.status(500).json( {message: "Något blev fel"} );
+            } else if (results.rowCount === 0) {
+                res.status(404).json( {message: "Jobbet hittades inte"} );
+            } else {
+                res.json( {message: "Jobbet har tagits bort"} );
+            }
     });
 });
-
 
 
 

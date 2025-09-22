@@ -10,17 +10,22 @@
     <h1>Test</h1>
 
     <script>
-        const url = "http://127.0.0.1:8000/api/jobs";
-
+        const url = "http://127.0.0.1:8000/api/jobs"; //ändra till forntend-porten??
         getData();
         //createJob("ISS", "Lokalvårdare", "2016-01-04", "Städade vårdcentraler"); 
 
         async function getData() {
-            const response = await fetch(url);
+            try {
+                const response = await fetch(url);
 
-            const data = await response.json();
+                if(!response) throw new Error(`HTTP-error. Status: ${response.status}`);
 
-            console.table(data.rows);
+                const data = await response.json();
+
+                console.table(data.rows); //ta bort rows??
+            } catch(error) {
+                console.error("Fel vid hämtning av data: ", error);
+            }
         }
 
         async function createJob(companyName, jobTitle, endDate, description) {
