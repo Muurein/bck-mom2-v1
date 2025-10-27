@@ -8,19 +8,20 @@ Det är skapat genom Render och Postgres.
 API:t använder databasen Postgres. Använd kommandot npm install för att installera de nödvändiga npm-paketen. 
 För att skapa databastabeller kör installationsskriptet install.js (kommando node install) för att skapa databastabellerna. De har följande uppbyggnad:
 
-| Tabell-namn | Fält | 
-| -------- | ------- |
-| Tabell 1 | **id**(serial primary key not null), **company_name**(varchar(150) not null), **job_title**(varchar(100) not null), **end_date**(date not null), **description**(varchar(500) not null) |
+| Tabell-namn | Fält                                                                                                                                                                                    | 
+| ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | 
+| Tabell 1    | **id**(serial primary key not null), **company_name**(varchar(150) not null), **job_title**(varchar(100) not null), **end_date**(date not null), **description**(varchar(500) not null) |
 
 
 ## Användning
 Så här kan man nå API:t:
-| Metod | Ändpunkt | Beskrivning |
-| ----- | -------- | ----------- |
-| GET   | /jobs    | Hämtar alla tillgängliga jobb |
-| POST  | /jobs    | Skapar och lagrar ett nytt jobb |
-| PUT   | /jobs/:id | Uppdaterar ett tillgängligt jobb med angivet id. Ett objekt behöver skickas med. |
-| DELETE | /jobs/:id | Tar bort ett tillgängligt jobb med angivet id |
+
+| Metod  | Ändpunkt  | Beskrivning                                                                      |
+| ------ | --------- | -------------------------------------------------------------------------------- |
+| GET    | /jobs     | Hämtar alla tillgängliga jobb                                                    |
+| POST   | /jobs     | Skapar och lagrar ett nytt jobb                                                  |
+| PUT    | /jobs/:id | Uppdaterar ett tillgängligt jobb med angivet id. Ett objekt behöver skickas med. |
+| DELETE | /jobs/:id | Tar bort ett tillgängligt jobb med angivet id                                    |
 
 
 ### Objekt-uppbyggnad
